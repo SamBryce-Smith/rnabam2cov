@@ -1,0 +1,11 @@
+name: rnabam2cov_dev
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.10
+  - bedtools>=2.31.0
+  - pip
+  - pip:
+    - -e ".[dev]"
