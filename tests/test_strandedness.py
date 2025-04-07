@@ -3,7 +3,7 @@ Tests for the strandedness module.
 """
 import pytest
 
-from src.rnabam2cov.strandedness import (
+from rnabam2cov.strandedness import (
     LibraryType,
     get_strand_mapping,
     get_output_prefixes,
