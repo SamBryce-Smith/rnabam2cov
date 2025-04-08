@@ -10,6 +10,72 @@ from rnabam2cov.coverage import FileType, get_stranded_coverage
 from rnabam2cov.strandedness import LibraryType, get_output_prefixes
 
 
+def validate_parameters(
+    bam_path: str,
+    libtype: str,
+    strands: List[str],
+    split: bool,
+    pc: bool,
+    fs: bool,
+    du: bool,
+    bg: bool,
+    bga: bool,
+    five_prime: bool,
+    three_prime: bool,
+    file_type: FileType
+) -> None:
+    """
+    Validate input parameters before processing.
+    
+    Args:
+        bam_path: Path to input BAM file
+        libtype: Library type ('forward' or 'reverse')
+        strands: List of strands to process ('+' and/or '-')
+        split: Treat "split" BAM entries as distinct intervals when computing coverage
+        pc: Calculate coverage of paired-end fragments (BAM only)
+        fs: Force provided fragment size instead of read length (BAM only)
+        du: Change strand of the mate read (so both reads from same strand) (BAM only)
+        bg: Report coverage in bedgraph format
+        bga: Report coverage in bedgraph format, including regions with zero coverage
+        five_prime: Calculate coverage of 5' positions only
+        three_prime: Calculate coverage of 3' positions only
+        file_type: Type of output file
+    
+    Raises:
+        ValueError: If any parameters are invalid
+        FileNotFoundError: If input BAM file does not exist
+    """
+    # Validate BAM file
+    if not Path(bam_path).exists():
+        raise FileNotFoundError(f"Input BAM file not found: {bam_path}")
+    
+    # Validate library type
+    if libtype not in LibraryType:
+        valid_types = list(LibraryType)
+        raise ValueError(f"Invalid library type '{libtype}'. Valid options are: {', '.join(valid_types)}")
+    
+    # Validate strands
+    valid_strands = ['+', '-']
+    for strand in strands:
+        if strand not in valid_strands:
+            raise ValueError(f"Invalid strand '{strand}'. Valid options are: '+' and '-'")
+    
+    # Validate mutually exclusive options
+    if bg and bga:
+        raise ValueError("Options 'bg' and 'bga' are mutually exclusive")
+    
+    if not bg and not bga:
+        raise ValueError("Either 'bg' or 'bga' must be True to generate a coverage file")
+    
+    if five_prime and three_prime:
+        raise ValueError("Options 'five_prime' and 'three_prime' are mutually exclusive")
+    
+    # Validate file type
+    if file_type not in FileType:
+        valid_types = [ft.value for ft in FileType]
+        raise ValueError(f"Invalid file type '{file_type}'. Valid options are: {', '.join(valid_types)}")
+
+
 def rnabam2cov(
     bam_path: str,
     libtype: str,
@@ -57,7 +123,20 @@ def rnabam2cov(
         List of paths to generated coverage files
     """
     
-    assert libtype in LibraryType
+    validate_parameters(
+        bam_path=bam_path,
+        libtype=libtype,
+        strands=strands,
+        split=split,
+        pc=pc,
+        fs=fs,
+        du=du,
+        bg=bg,
+        bga=bga,
+        five_prime=five_prime,
+        three_prime=three_prime,
+        file_type=file_type
+    )
 
     # Get output prefixes based on library type
     output_prefixes = get_output_prefixes(output_prefix, libtype)
@@ -215,12 +294,7 @@ def main():
     """Main entry point for the CLI."""
     args = parse_args()
     
-    try:
-        # Convert input path to Path object
-        bam_path = Path(args.input)
-        if not bam_path.exists():
-            raise FileNotFoundError(f"Input BAM file not found: {bam_path}")
-        
+    try:        
         # Set bg/bga based on args
         if args.bga:
             bg = False
@@ -231,7 +305,7 @@ def main():
             
         # Call the wrapper function
         output_files = rnabam2cov(
-            bam_path=str(bam_path),
+            bam_path=str(args.input),
             libtype=args.libtype,
             output_prefix=args.output_prefix,
             strands=args.strand,

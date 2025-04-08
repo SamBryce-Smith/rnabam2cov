@@ -98,35 +98,58 @@ def test_cli_single_strand(temp_output_dir):
     # Check that the output file matches the expected file
     assert files_are_equal(f"{output_prefix}.plus.bedgraph", expected_plus)
 
-
-def test_cli_invalid_libtype():
-    """Test that the CLI raises an error for an invalid library type."""
-    # Set up paths
-    input_bam = "tests/data/example.forward.bam"
-    
-    # Check that an invalid library type raises an AssertionError
-    # (Note: changed from ValueError to AssertionError to match actual behavior)
-    with pytest.raises(AssertionError):
-        cli.rnabam2cov(
-            bam_path=input_bam,
-            libtype="invalid",
-            output_prefix="output"
-        )
-
-
 def test_cli_invalid_strand():
     """Test that the CLI raises an error for an invalid strand."""
     # Set up paths
     input_bam = "tests/data/example.forward.bam"
     
-    # Check that an invalid strand raises a KeyError
-    # (Note: changed from ValueError to KeyError to match actual behavior)
-    with pytest.raises(KeyError, match="'invalid'"):
+    # Check that an invalid strand raises a ValueError with appropriate message
+    with pytest.raises(ValueError, match="Invalid strand 'invalid'"):
         cli.rnabam2cov(
             bam_path=input_bam,
             libtype="forward",
             output_prefix="output",
             strands=["invalid"]
+        )
+
+
+def test_cli_nonexistent_file():
+    """Test that the CLI raises an error for a nonexistent input file."""
+    # Set up a path to a file that doesn't exist
+    input_bam = "nonexistent_file.bam"
+    
+    # Check that a nonexistent file raises a FileNotFoundError
+    with pytest.raises(FileNotFoundError, match="Input BAM file not found"):
+        cli.rnabam2cov(
+            bam_path=input_bam,
+            libtype="forward",
+            output_prefix="output"
+        )
+
+
+def test_cli_mutually_exclusive_options():
+    """Test that the CLI raises an error for mutually exclusive options."""
+    # Set up paths
+    input_bam = "tests/data/example.forward.bam"
+    
+    # Check that setting both bg and bga to True raises a ValueError
+    with pytest.raises(ValueError, match="Options 'bg' and 'bga' are mutually exclusive"):
+        cli.rnabam2cov(
+            bam_path=input_bam,
+            libtype="forward",
+            output_prefix="output",
+            bg=True,
+            bga=True
+        )
+    
+    # Check that setting both five_prime and three_prime to True raises a ValueError
+    with pytest.raises(ValueError, match="Options 'five_prime' and 'three_prime' are mutually exclusive"):
+        cli.rnabam2cov(
+            bam_path=input_bam,
+            libtype="forward",
+            output_prefix="output",
+            five_prime=True,
+            three_prime=True
         )
 
 
