@@ -1,0 +1,55 @@
+name: Build and Test conda-based Python Package
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+      max-parallel: 4
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Conda with Python ${{ matrix.python-version }}
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        python-version: ${{ matrix.python-version }}
+        activate-environment: rnabam2cov_dev
+        environment-file: rnabam2cov_dev.yaml
+
+    - name: Lint with ruff
+      shell: bash -el {0}
+      run: |
+        ruff check .
+        
+    - name: Test with pytest
+      shell: bash -el {0}
+      run: |
+        pytest -v
+        
+  install:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Conda with main environment file
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        python-version: '3.10'
+        activate-environment: rnabam2cov
+        environment-file: rnabam2cov.yaml
+        
+    - name: Verify installation
+      shell: bash -el {0}
+      run: |
+        python -c "import rnabam2cov, pybedtools; print(rnabam2cov.__version__); a = pybedtools.example_bedtool('a.bed'); b = pybedtools.example_bedtool('b.bed'); print(a.intersect(b))"
