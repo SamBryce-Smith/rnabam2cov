@@ -52,4 +52,4 @@ jobs:
     - name: Verify installation
       shell: bash -el {0}
       run: |
-        python -c "import rnabam2cov, pybedtools; print(rnabam2cov.__version__); a = pybedtools.example_bedtool('a.bed'); b = pybedtools.example_bedtool('b.bed'); print(a.intersect(b))"
+        python -c "import rnabam2cov, pybedtools; a = pybedtools.example_bedtool('a.bed'); b = pybedtools.example_bedtool('b.bed'); print(a.intersect(b))"
