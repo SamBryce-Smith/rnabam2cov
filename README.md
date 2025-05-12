@@ -45,6 +45,18 @@ mamba env create -f rnabam2cov_dev.yaml
 mamba activate rnabam2cov_dev
 ```
 
+It is also possible to install via `pip install` / `uv pip install` directly from github, although this is not recommended because it will not install bedtools:
+
+```bash
+# for installing at specific commit/release tag, suffix the URL with @<commit hash/tag>
+pip install git+https://github.com/SamBryce-Smith/rnabam2cov
+# verify bedtools is installed
+python -c "import rnabam2cov, pybedtools; a = pybedtools.example_bedtool('a.bed'); b = pybedtools.example_bedtool('b.bed'); print(a.intersect(b))"
+chr1    155     200     feature2        0       +
+chr1    155     200     feature3        0       -
+chr1    900     901     feature4        0       +
+```
+
 ## Usage
 
 ### Command Line Usage
