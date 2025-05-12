@@ -2,7 +2,7 @@ import os
 import pytest
 from pathlib import Path
 import filecmp
-from rnabam2cov.coverage import get_stranded_bedgraph, get_file_extension, FileType
+from rnabam2cov.coverage import get_stranded_bedgraph
 
 # Path to test data directory
 DATA_DIR = Path("tests/data")

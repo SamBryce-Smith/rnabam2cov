@@ -50,8 +50,9 @@ def validate_parameters(
         raise FileNotFoundError(f"Input BAM file not found: {bam_path}")
     
     # Validate library type
-    if libtype not in LibraryType:
-        valid_types = list(LibraryType)
+    
+    valid_types = [lt.value for lt in LibraryType]
+    if libtype not in valid_types:
         raise ValueError(f"Invalid library type '{libtype}'. Valid options are: {', '.join(valid_types)}")
     
     # Validate strands
@@ -71,9 +72,9 @@ def validate_parameters(
         raise ValueError("Options 'five_prime' and 'three_prime' are mutually exclusive")
     
     # Validate file type
-    if file_type not in FileType:
-        valid_types = [ft.value for ft in FileType]
-        raise ValueError(f"Invalid file type '{file_type}'. Valid options are: {', '.join(valid_types)}")
+    valid_file_types = [ft.value for ft in FileType]
+    if file_type.value not in valid_file_types:
+        raise ValueError(f"Invalid file type '{file_type}'. Valid options are: {', '.join(valid_file_types)}")
 
 
 def rnabam2cov(
@@ -184,7 +185,7 @@ def parse_args(args=None):
     parser.add_argument(
         "--libtype", 
         required=True, 
-        choices=["forward", "reverse"], 
+        choices=[lt.value for lt in LibraryType],
         help="Library strandedness type (forward=FR/fr-secondstrand, reverse=RF/fr-firststrand)"
     )
     parser.add_argument(
