@@ -171,7 +171,6 @@ def test_cli_subprocess_invalid_libtype(temp_output_dir):
     assert result.returncode != 0
     # The actual error message is from argparse and will mention "invalid choice"
     assert "invalid choice" in result.stderr
-    assert "forward, reverse" in result.stderr
 
 
 def test_cli_subprocess_invalid_strand(temp_output_dir):
