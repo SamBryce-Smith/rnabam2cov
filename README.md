@@ -1,5 +1,7 @@
 # rnabam2cov - Library-type aware generation of strand-specific per-base coverage tracks from RNA-seq BAM files
 
+[![DOI](https://zenodo.org/badge/957922139.svg)](https://doi.org/10.5281/zenodo.15390037)
+
 A convenient wrapper around bedtools genomecov to compute library-type aware, strand-specific per-base coverage from RNA-seq BAM files.
 
 ## Contents
