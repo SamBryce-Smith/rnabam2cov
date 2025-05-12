@@ -10,6 +10,7 @@ A convenient wrapper around bedtools genomecov to compute library-type aware, st
 - [Usage](#usage)
   - [Command Line Usage](#command-line-usage)
   - [Python API Usage](#python-api-usage)
+- [Notes](#notes)
 
 ## Installation
 
@@ -115,3 +116,9 @@ plus_only = rnabam2cov(
 print(plus_only)
 # ['output/coverage_plus_only.plus.bedgraph']
 ```
+
+## Notes
+
+- It appears that bedtools genomecov includes secondary alignments in the computed coverage ([GitHub issue 1061](https://github.com/arq5x/bedtools2/issues/1061)), although it's unclear exactly how the counting is done. If you want to compute coverage of primary alignments only, you will need to prefilter the BAM file.
+- The `-pc` and `-split` flag are currently incompatible - cigar strings (i.e. splicing) is ignored when the `-pc` flag is passed (I reproduced this, but initially reported in [GitHub issue 516](https://github.com/arq5x/bedtools2/issues/516)). Although I want to double-check, I expect this means that positions in fragments that are covered by both mates will be double-counted (i.e. coverage is per-read, not per-fragment). I do not see an obvious way to get around this without a non-bedtools implementation.
+- This package calls bedtools genomecov via pybedtools - this will mean use of temporary files (by default under `/tmp`). pybedtools provides a way to set the temporary directory for the session, but I haven't exposed this to the CLI yet.
