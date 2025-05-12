@@ -185,7 +185,7 @@ def parse_args(args=None):
     parser.add_argument(
         "--libtype", 
         required=True, 
-        choices=["forward", "reverse"], 
+        choices=[lt.value for lt in LibraryType],
         help="Library strandedness type (forward=FR/fr-secondstrand, reverse=RF/fr-firststrand)"
     )
     parser.add_argument(
